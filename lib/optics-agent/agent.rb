@@ -19,18 +19,31 @@ module OpticsAgent
     def initialize
       @query_queue = []
       @semaphone = Mutex.new
+
+      # TODO: make these configurable
+      @schema_report_delay = 10
+      @report_interval = 60
     end
 
     def instrument_schema(schema)
       @schema = schema
       schema.middleware << graphql_middleware
 
-      SchemaJob.perform_in(10, self)
+      Thread.new do
+        sleep @schema_report_delay
+        SchemaJob.new.perform(self)
+      end
+
       schedule_report
     end
 
     def schedule_report
-      ReportJob.perform_in(60, self)
+      Thread.new do
+        while true
+          sleep @report_interval
+          ReportJob.new.perform(self)
+        end
+      end
     end
 
     def add_query(query, rack_env, start_time, end_time)

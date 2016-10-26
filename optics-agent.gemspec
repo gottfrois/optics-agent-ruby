@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'graphql', '~> 0.19.0'
   s.add_runtime_dependency 'google-protobuf', '~> 3.1.0'
-  s.add_runtime_dependency 'sucker_punch', '~> 2.0.2'
 
   s.add_development_dependency 'rake', '~> 11.3.0'
   s.add_development_dependency 'rspec', '~> 3.5.0'

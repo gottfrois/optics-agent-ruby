@@ -4,12 +4,10 @@ PATH
     optics-agent (0.2.0)
       google-protobuf (~> 3.1.0)
       graphql (~> 0.19.0)
-      sucker_punch (~> 2.0.2)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    concurrent-ruby (1.0.2)
     diff-lcs (1.2.5)
     google-protobuf (3.1.0)
     graphql (0.19.4)
@@ -27,8 +25,6 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.5.0)
     rspec-support (3.5.0)
-    sucker_punch (2.0.2)
-      concurrent-ruby (~> 1.0.0)
 
 PLATFORMS
   ruby
