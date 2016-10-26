@@ -1,5 +1,9 @@
 ### vNEXT
 
+### v0.2.1
+
+- Use a simple `Thread.new` instead of sucker_punch and concurrent-ruby.
+
 ### v0.2.0
 
 - We only require you to pass in the query_string, rather than the full graphql request params now. See https://github.com/apollostack/optics-agent-ruby/pull/27
