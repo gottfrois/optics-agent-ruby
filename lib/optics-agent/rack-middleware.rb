@@ -16,14 +16,7 @@ module OpticsAgent
       query = OpticsAgent::Reporting::Query.new
 
       # Attach so resolver middleware can access
-      env[:optics_agent] = {
-        agent: agent,
-        query: query
-      }
-      env[:optics_agent].define_singleton_method(:with_document) do |document|
-        self[:query].document = document
-        self
-      end
+      env[:optics_agent] = RackAgent.new(agent, query)
 
       result = @app.call(env)
 
@@ -36,6 +29,19 @@ module OpticsAgent
       end
 
       result
+    end
+  end
+
+  class RackAgent
+    attr_reader :agent, :query
+    def initialize(agent, query)
+      @agent = agent
+      @query = query
+    end
+
+    def with_document(query_string)
+      @query.document = query_string
+      self
     end
   end
 end

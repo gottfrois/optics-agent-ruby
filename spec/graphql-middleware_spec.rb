@@ -1,3 +1,4 @@
+require 'ostruct'
 require 'optics-agent/graphql-middleware'
 require 'graphql'
 
@@ -32,7 +33,7 @@ describe GraphqlMiddleware do
 
     query = spy("query")
     schema.execute('{ person { firstName lastName } }', {
-      context: { optics_agent: { query: query } }
+      context: { optics_agent: OpenStruct.new(query: query) }
     })
 
     expect(query).to have_received(:report_field).exactly(3).times

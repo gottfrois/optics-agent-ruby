@@ -9,7 +9,7 @@ module OpticsAgent
       result = next_middleware.call
       end_time = Time.now
 
-      query = query_context[:optics_agent][:query]
+      query = query_context[:optics_agent].query
       query.report_field(parent_type.to_s, field_definition.name, start_time, end_time)
 
       result
