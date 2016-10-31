@@ -55,7 +55,7 @@ Register the Rack middleware (say in a `config.ru`):
 use agent.rack_middleware
 ```
 
-Register the Graphql middleware:
+Register the GraphQL middleware:
 
 ```ruby
 agent.instrument_schema(YourSchema)
@@ -84,7 +84,7 @@ end
 
 The equivalent of the above for Rails is:
 
-Create an agent in `config/apllication.rb`, and register the rack middleware:
+Create an agent in `config/application.rb`, and register the rack middleware:
 
 ```ruby
 module YourApplicationRails
@@ -98,7 +98,7 @@ end
 
 ```
 
-Register the Graphql middleware when you create your schema:
+Register the GraphQL middleware when you create your schema:
 
 ```ruby
 Rails.application.config.optics_agent.instrument_schema(YourSchema)
