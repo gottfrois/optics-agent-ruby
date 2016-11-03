@@ -9,11 +9,11 @@ module OpticsAgent::Reporting
 
         # XXX: don't send *every* trace
         query_trace = QueryTrace.new(*item)
-        query_trace.send
+        query_trace.send_with(agent)
       end
 
       report.decorate_from_schema(agent.schema)
-      report.send
+      report.send_with(agent)
     end
   end
 end

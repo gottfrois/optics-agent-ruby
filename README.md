@@ -20,7 +20,25 @@ To your `Gemfile`
 
 ### API key
 
-You'll need to run your app with the `OPTICS_API_KEY` environment variable set to the API key of your Apollo Optics service; at the moment Optics is in early access alpha--[get in touch](http://www.apollostack.com/optics) if you want to be part of our early access program.
+You'll need to run your app with the `OPTICS_API_KEY` environment variable set (or set via options) to the API key of your Apollo Optics service; you can get an API key by setting up a service at https://optics.apollodata.com.
+
+### Configuration
+
+After creating an agent (see below), you can configure it with
+
+```rb
+agent.set_options(option: value)
+```
+
+Possible options are:
+
+  - `api_key` - Your API key for the Optics service. This defaults to the OPTICS_API_KEY environment variable, but can be overridden here.
+  - `endpoint_url ['https://optics-report.apollodata.com']` - Where to send the reports. Defaults to the production Optics endpoint, or the `OPTICS_ENDPOINT_URL` environment variable if it is set. You shouldn't need to set this unless you are debugging
+  - `debug [false]` - Log detailed debugging messages
+  - `disable_reporting [false]` - Don't report anything to Optics (useful for testing)
+  - `print_reports [false]` - Print JSON versions of the data sent to Optics to the log
+  - `schema_report_delay_ms [10000]` - How long to wait before sending a schema report after startup, in, milliseconds
+  - `report_interval_ms [60000]` - How often to send reports in milliseconds. Defaults to 1 minute. Minimum 10 seconds. You shouldn't need to set this unless you are debugging.
 
 ### Basic Rack/Sinatra
 

@@ -1,6 +1,5 @@
 require 'apollo/optics/proto/reports_pb'
 require 'optics-agent/reporting/helpers'
-require 'optics-agent/reporting/send-message'
 
 module OpticsAgent::Reporting
   # A trace is just a different view of a single query report, with full
@@ -49,8 +48,8 @@ module OpticsAgent::Reporting
       })
     end
 
-    def send
-      send_message('/api/ss/traces', @report)
+    def send_with(agent)
+      agent.send_message('/api/ss/traces', @report)
     end
   end
 end

@@ -4,6 +4,7 @@ require 'optics-agent/graphql-middleware'
 require 'optics-agent/reporting/report_job'
 require 'optics-agent/reporting/schema_job'
 require 'optics-agent/reporting/query-trace'
+require 'net/http'
 
 module OpticsAgent
   # XXX: this is a class but acts as a singleton right now.
@@ -20,27 +21,46 @@ module OpticsAgent
       @query_queue = []
       @semaphone = Mutex.new
 
-      # TODO: make these configurable
-      @schema_report_delay = 10
-      @report_interval = 60
+      # set defaults
+      self.set_options
+    end
+
+    def set_options(
+      debug: false,
+      disable_reporting: false,
+      print_reports: false,
+      schema_report_delay_ms: 10 * 1000,
+      report_interval_ms: 60 * 1000,
+      api_key: ENV['OPTICS_API_KEY'],
+      endpoint_url: ENV['OPTICS_ENDPOINT_URL'] || 'https://optics-report.apollodata.com'
+    )
+      @debug = debug
+      @disable_reporting = disable_reporting || !endpoint_url || endpoint_url.nil?
+      @print_reports = print_reports
+      @schema_report_delay_ms = schema_report_delay_ms
+      @report_interval_ms = report_interval_ms
+      @api_key = api_key
+      @endpoint_url = endpoint_url
     end
 
     def instrument_schema(schema)
       @schema = schema
       schema.middleware << graphql_middleware
 
-      Thread.new do
-        sleep @schema_report_delay
-        SchemaJob.new.perform(self)
-      end
+      unless @disable_reporting
+        Thread.new do
+          sleep @schema_report_delay_ms / 1000
+          SchemaJob.new.perform(self)
+        end
 
-      schedule_report
+        schedule_report
+      end
     end
 
     def schedule_report
       Thread.new do
         while true
-          sleep @report_interval
+          sleep @report_interval_ms / 1000
           ReportJob.new.perform(self)
         end
       end
@@ -67,6 +87,35 @@ module OpticsAgent
     def graphql_middleware
       # graphql middleware doesn't seem to need the agent but certainly could have it
       OpticsAgent::GraphqlMiddleware.new
+    end
+
+    def send_message(path, message)
+      req = Net::HTTP::Post.new(path)
+      req['x-api-key'] = @api_key
+      req['user-agent'] = "optics-agent-rb"
+
+      req.body = message.class.encode(message)
+      if @debug || @print_reports
+        log "sending message: #{message.class.encode_json(message)}"
+      end
+
+      uri = URI.parse(@endpoint_url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      res = http.request(req)
+
+      if @debug || @print_reports
+        log "got response: #{res.inspect}"
+        log "response body: #{res.body.inspect}"
+      end
+    end
+
+    def log(message)
+      puts "optics-agent: #{message}"
+    end
+
+    def debug(message)
+      log "DEBUG: #{message}" if @debug
     end
   end
 end

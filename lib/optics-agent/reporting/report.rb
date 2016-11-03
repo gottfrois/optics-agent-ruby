@@ -1,5 +1,4 @@
 require 'apollo/optics/proto/reports_pb'
-require 'optics-agent/reporting/send-message'
 require 'optics-agent/reporting/helpers'
 require 'optics-agent/normalization/latency'
 
@@ -29,9 +28,9 @@ module OpticsAgent::Reporting
       @report.realtime_duration || duration_nanos(@report.start_time, @report.end_time)
     end
 
-    def send
+    def send_with(agent)
       self.finish!
-      send_message('/api/ss/stats', @report)
+      agent.send_message('/api/ss/stats', @report)
     end
 
     # XXX: record timing / client

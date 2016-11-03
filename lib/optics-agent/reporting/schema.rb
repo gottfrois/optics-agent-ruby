@@ -3,7 +3,6 @@ require 'graphql'
 
 require 'apollo/optics/proto/reports_pb'
 require 'optics-agent/reporting/helpers'
-require 'optics-agent/reporting/send-message'
 require 'optics-agent/instrumentation/query-schema'
 
 module OpticsAgent::Reporting
@@ -49,8 +48,8 @@ module OpticsAgent::Reporting
       types
     end
 
-    def send
-      send_message('/api/ss/schema', @message)
+    def send_with(agent)
+      agent.send_message('/api/ss/schema', @message)
     end
   end
 end
