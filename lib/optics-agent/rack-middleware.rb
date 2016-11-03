@@ -12,6 +12,7 @@ module OpticsAgent
 
       # XXX: figure out a way to pass this in here
       agent = OpticsAgent::Agent.instance
+      agent.debug { "rack-middleware: request started" }
       query = OpticsAgent::Reporting::Query.new
 
       # Attach so resolver middleware can access
@@ -28,7 +29,9 @@ module OpticsAgent
 
       # XXX: this approach means if the user forgets to call with_document
       # we just never log queries. Can we detect if the request is a graphql one?
+      agent.debug { "rack-middleware: request finished" }
       if (query.document)
+        agent.debug { "rack-middleware: adding query to agent" }
         agent.add_query(query, env, start_time, Time.now)
       end
 

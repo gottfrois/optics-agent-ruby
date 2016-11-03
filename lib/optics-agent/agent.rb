@@ -45,11 +45,15 @@ module OpticsAgent
 
     def instrument_schema(schema)
       @schema = schema
+      debug "adding middleware to schema"
       schema.middleware << graphql_middleware
 
       unless @disable_reporting
+        debug "spawning schema thread"
         Thread.new do
+          debug "schema thread spawned"
           sleep @schema_report_delay_ms / 1000
+          debug "running schema job"
           SchemaJob.new.perform(self)
         end
 
@@ -58,9 +62,12 @@ module OpticsAgent
     end
 
     def schedule_report
+      debug "spawning reporting thread"
       Thread.new do
+        debug "reporting thread spawned"
         while true
           sleep @report_interval_ms / 1000
+          debug "running reporting job"
           ReportJob.new.perform(self)
         end
       end
@@ -68,12 +75,14 @@ module OpticsAgent
 
     def add_query(query, rack_env, start_time, end_time)
       @semaphone.synchronize {
+        debug { "adding query to queue, queue length was #{@query_queue.length}" }
         @query_queue << [query, rack_env, start_time, end_time]
       }
     end
 
     def clear_query_queue
       @semaphone.synchronize {
+        debug { "clearing query queue, queue length was #{@query_queue.length}" }
         queue = @query_queue
         @query_queue = []
         queue
@@ -110,12 +119,16 @@ module OpticsAgent
       end
     end
 
-    def log(message)
+    def log(message = nil)
+      message = yield unless message
       puts "optics-agent: #{message}"
     end
 
-    def debug(message)
-      log "DEBUG: #{message}" if @debug
+    def debug(message = nil)
+      if @debug
+        message = yield unless message
+        log "DEBUG: #{message} <#{Process.pid} | #{Thread.current.object_id}>"
+      end
     end
   end
 end
