@@ -1,5 +1,11 @@
 ### vNEXT
 
+### v0.3.0
+
+- Added `agent.set_options` to allow you to configure the agent. (See the README for more info)
+- Added a `debug` option which logs a lot of useful info about reporting
+- Use an object for :optics_agent [PR #28](https://github.com/apollostack/optics-agent-ruby/pull/28)
+
 ### v0.2.1
 
 - Use a simple `Thread.new` instead of sucker_punch and concurrent-ruby.
