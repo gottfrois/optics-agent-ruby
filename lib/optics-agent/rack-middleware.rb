@@ -12,6 +12,7 @@ module OpticsAgent
 
       # XXX: figure out a way to pass this in here
       agent = OpticsAgent::Agent.instance
+      agent.ensure_reporting!
       agent.debug { "rack-middleware: request started" }
       query = OpticsAgent::Reporting::Query.new
 

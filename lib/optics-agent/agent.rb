@@ -56,8 +56,15 @@ module OpticsAgent
           debug "running schema job"
           SchemaJob.new.perform(self)
         end
+      end
+    end
 
+    # we call this method on every request to ensure that the reporting thread
+    # is active in the correct process for pre-forking webservers like unicorn
+    def ensure_reporting!
+      unless @reporting_thread_active
         schedule_report
+        @reporting_thread_active = true
       end
     end
 
