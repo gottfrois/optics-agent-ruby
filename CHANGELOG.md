@@ -1,5 +1,10 @@
 ### vNEXT
 
+### v0.3.1
+
+- Be more aggressive about waiting until the first request to spawn the reporting thread; to achieve better behaviour on pre-forking webservers such as Unicorn and Puma.
+
+
 ### v0.3.0
 
 - Added `agent.set_options` to allow you to configure the agent. (See the README for more info)
