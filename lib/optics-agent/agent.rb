@@ -52,7 +52,7 @@ module OpticsAgent
         debug "spawning schema thread"
         Thread.new do
           debug "schema thread spawned"
-          sleep @schema_report_delay_ms / 1000
+          sleep @schema_report_delay_ms / 1000.0
           debug "running schema job"
           SchemaJob.new.perform(self)
         end
@@ -73,7 +73,7 @@ module OpticsAgent
       Thread.new do
         debug "reporting thread spawned"
         while true
-          sleep @report_interval_ms / 1000
+          sleep @report_interval_ms / 1000.0
           debug "running reporting job"
           ReportJob.new.perform(self)
         end
