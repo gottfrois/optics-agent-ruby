@@ -104,6 +104,20 @@ end
 
 ```
 
+Register the GraphQL middleware when you create your schema:
+
+```ruby
+agent = Rails.application.config.optics_agent
+YourSchema = GraphQL::Schema.define do
+  query QueryType
+  mutation MutationType
+  # ... etc
+
+  agent.instrument self
+end
+agent.instrument_schema(YourSchema, no_middleware: true
+```
+
 Register Optics Agent on the GraphQL context within your `graphql` action as below:
 
 ```ruby

@@ -1,5 +1,6 @@
 require 'optics-agent/rack-middleware'
 require 'optics-agent/graphql-middleware'
+require 'optics-agent/instrumenters/field'
 require 'optics-agent/reporting/report_job'
 require 'optics-agent/reporting/schema_job'
 require 'optics-agent/reporting/query-trace'
@@ -32,7 +33,14 @@ module OpticsAgent
       @configuration.disable_reporting || !@configuration.api_key || !@schema
     end
 
-    def instrument_schema(schema)
+    # Like instrument_schema, but intended to be called from inside a Schema.define
+    # block, so we can call `schema.instrument` (we can't call when a schema is defined)
+    def instrument(schema)
+      debug 'adding instrumentation to schema'
+      schema.instrument(:field, Instrumenters::Field.new(self))
+    end
+
+    def instrument_schema(schema, no_middleware: false)
       unless @configuration.api_key
         warn """No api_key set.
 Either configure it or use the OPTICS_API_KEY environment variable.
@@ -42,7 +50,7 @@ Either configure it or use the OPTICS_API_KEY environment variable.
 
       @schema = schema
       debug "adding middleware to schema"
-      schema.middleware << graphql_middleware
+      schema.middleware << graphql_middleware unless no_middleware
 
       unless disabled?
         debug "spawning schema thread"
