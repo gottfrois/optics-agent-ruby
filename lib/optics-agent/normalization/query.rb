@@ -58,7 +58,7 @@ module OpticsAgent
 
         visitor[Nodes::InlineFragment].leave << -> (node, parent) do
           selections = current[:selections]
-          stack[0][:selections] << "... on #{node.type} #{block(selections)}"
+          stack[0][:selections] << "... on #{node.type.name} #{block(selections)}"
         end
 
         visitor[Nodes::FragmentSpread].leave << -> (node, parent) do
@@ -90,7 +90,7 @@ module OpticsAgent
         visitor[Nodes::FragmentDefinition].leave << -> (node, parent) do
           selections = current[:selections]
           if (used_fragment_names.include?(node.name))
-            output << " fragment #{node.name} on #{node.type} " \
+            output << " fragment #{node.name} on #{node.type.name} " \
               + block(selections)
           end
         end
