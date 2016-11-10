@@ -16,7 +16,7 @@ module OpticsAgent
     include Singleton
     include OpticsAgent::Reporting
 
-    attr_reader :schema
+    attr_reader :schema, :report_traces
 
     def initialize
       @query_queue = []
@@ -30,6 +30,7 @@ module OpticsAgent
       debug: false,
       disable_reporting: false,
       print_reports: false,
+      report_traces: true,
       schema_report_delay_ms: 10 * 1000,
       report_interval_ms: 60 * 1000,
       api_key: ENV['OPTICS_API_KEY'],
@@ -38,6 +39,7 @@ module OpticsAgent
       @debug = debug
       @disable_reporting = disable_reporting || !endpoint_url || endpoint_url.nil?
       @print_reports = print_reports
+      @report_traces = report_traces
       @schema_report_delay_ms = schema_report_delay_ms
       @report_interval_ms = report_interval_ms
       @api_key = api_key

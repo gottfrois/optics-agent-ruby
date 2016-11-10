@@ -15,7 +15,7 @@ module OpticsAgent::Reporting
     attr_reader :report
     attr_reader :traces_to_report
 
-    def initialize
+    def initialize(report_traces: true)
       # internal report that we encapsulate
       @report = StatsReport.new({
         header: ReportHeader.new({
@@ -26,6 +26,7 @@ module OpticsAgent::Reporting
 
       @interval = Hitimes::Interval.now
 
+      @report_traces = report_traces
       @traces_to_report = []
     end
 
@@ -69,11 +70,13 @@ module OpticsAgent::Reporting
 
       query.add_to_stats(signature_stats)
 
-      # Is this the first query we've seen in this reporting period and
-      # latency bucket? In which case we want to send a trace
-      bucket = latency_bucket_for_duration(query.duration)
-      if (client_stats.latency_count[bucket] == 1)
-        @traces_to_report << QueryTrace.new(query, rack_env)
+      if @report_traces
+        # Is this the first query we've seen in this reporting period and
+        # latency bucket? In which case we want to send a trace
+        bucket = latency_bucket_for_duration(query.duration)
+        if (client_stats.latency_count[bucket] == 1)
+          @traces_to_report << QueryTrace.new(query, rack_env)
+        end
       end
     end
 
