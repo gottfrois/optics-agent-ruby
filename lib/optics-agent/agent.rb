@@ -5,6 +5,7 @@ require 'optics-agent/reporting/report_job'
 require 'optics-agent/reporting/schema_job'
 require 'optics-agent/reporting/query-trace'
 require 'net/http'
+require 'faraday'
 
 module OpticsAgent
   # XXX: this is a class but acts as a singleton right now.
@@ -59,12 +60,19 @@ module OpticsAgent
       end
     end
 
-    # we call this method on every request to ensure that the reporting thread
+    # We call this method on every request to ensure that the reporting thread
     # is active in the correct process for pre-forking webservers like unicorn
     def ensure_reporting!
       unless @reporting_thread_active
         schedule_report
         @reporting_thread_active = true
+      end
+    end
+
+    def reporting_connection
+      @reporting_connection ||= Faraday.new(:url => @endpoint_url) do |faraday|
+        # XXX: allow setting adaptor in config
+        faraday.adapter :net_http_persistent
       end
     end
 
@@ -107,23 +115,20 @@ module OpticsAgent
     end
 
     def send_message(path, message)
-      req = Net::HTTP::Post.new(path)
-      req['x-api-key'] = @api_key
-      req['user-agent'] = "optics-agent-rb"
+      response = reporting_connection.post do |request|
+        request.url path
+        request.headers['x-api-key'] = @api_key
+        request.headers['user-agent'] = "optics-agent-rb"
 
-      req.body = message.class.encode(message)
-      if @debug || @print_reports
-        log "sending message: #{message.class.encode_json(message)}"
+        request.body = message.class.encode(message)
+        if @debug || @print_reports
+          log "sending message: #{message.class.encode_json(message)}"
+        end
       end
 
-      uri = URI.parse(@endpoint_url)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true
-      res = http.request(req)
-
       if @debug || @print_reports
-        log "got response: #{res.inspect}"
-        log "response body: #{res.body.inspect}"
+        log "got response: #{response}"
+        log "response body: #{response.body}"
       end
     end
 
