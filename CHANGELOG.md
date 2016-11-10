@@ -1,6 +1,8 @@
 ### vNEXT
 
- - Sample the traces we report [Issue #20](https://github.com/apollostack/optics-agent-ruby/pull/20), rather than reporting a trace for every query.
+ - Sample the traces we report [Issue #20](https://github.com/apollostack/optics-agent-ruby/issues/20), rather than reporting a trace for every query.
+
+ - Use `hitimes`, a high resolution timer library [Issue #21](https://github.com/apollostack/optics-agent-ruby/issues/21).
 
 
 ### v0.3.1
