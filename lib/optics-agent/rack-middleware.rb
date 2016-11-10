@@ -1,6 +1,5 @@
 require 'optics-agent/agent'
 require 'optics-agent/reporting/query'
-
 module OpticsAgent
   class RackMiddleware
     def initialize(app, options={})
@@ -8,12 +7,11 @@ module OpticsAgent
     end
 
     def call(env)
-      start_time = Time.now
-
       # XXX: figure out a way to pass this in here
       agent = OpticsAgent::Agent.instance
       agent.ensure_reporting!
       agent.debug { "rack-middleware: request started" }
+
       query = OpticsAgent::Reporting::Query.new
 
       # Attach so resolver middleware can access
@@ -26,7 +24,8 @@ module OpticsAgent
       agent.debug { "rack-middleware: request finished" }
       if (query.document)
         agent.debug { "rack-middleware: adding query to agent" }
-        agent.add_query(query, env, start_time, Time.now)
+        query.finish!
+        agent.add_query(query, env)
       end
 
       result

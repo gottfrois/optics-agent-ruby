@@ -89,10 +89,10 @@ module OpticsAgent
       end
     end
 
-    def add_query(query, rack_env, start_time, end_time)
+    def add_query(*args)
       @semaphone.synchronize {
         debug { "adding query to queue, queue length was #{@query_queue.length}" }
-        @query_queue << [query, rack_env, start_time, end_time]
+        @query_queue << args
       }
     end
 

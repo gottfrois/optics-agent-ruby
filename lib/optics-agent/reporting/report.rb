@@ -1,6 +1,7 @@
 require 'apollo/optics/proto/reports_pb'
 require 'optics-agent/reporting/helpers'
 require 'optics-agent/normalization/latency'
+require 'hitimes'
 
 module OpticsAgent::Reporting
   # This class represents a complete report that we send to the optics server
@@ -23,12 +24,14 @@ module OpticsAgent::Reporting
         start_time: generate_timestamp(Time.now)
       })
 
+      @interval = Hitimes::Interval.now
+
       @traces_to_report = []
     end
 
     def finish!
       @report.end_time ||= generate_timestamp(Time.now)
-      @report.realtime_duration || duration_nanos(@report.start_time, @report.end_time)
+      @report.realtime_duration || duration_nanos(@interval.stop)
     end
 
     def send_with(agent)
@@ -48,7 +51,7 @@ module OpticsAgent::Reporting
       agent.send_message('/api/ss/stats', @report)
     end
 
-    def add_query(query, rack_env, start_time, end_time)
+    def add_query(query, rack_env)
       @report.per_signature[query.signature] ||= StatsPerSignature.new
       signature_stats = @report.per_signature[query.signature]
 
@@ -60,18 +63,17 @@ module OpticsAgent::Reporting
       client_stats = signature_stats.per_client_name[info[:client_name]]
 
       # XXX: handle errors
-      add_latency(client_stats.latency_count, start_time, end_time)
+      add_latency(client_stats.latency_count, query.duration)
       client_stats.count_per_version[info[:client_version]] ||= 0
       client_stats.count_per_version[info[:client_version]] += 1
 
       query.add_to_stats(signature_stats)
 
-      bucket = latency_bucket_for_times(start_time, end_time)
-
       # Is this the first query we've seen in this reporting period and
       # latency bucket? In which case we want to send a trace
+      bucket = latency_bucket_for_duration(query.duration)
       if (client_stats.latency_count[bucket] == 1)
-        @traces_to_report << QueryTrace.new(query, rack_env, start_time, end_time)
+        @traces_to_report << QueryTrace.new(query, rack_env)
       end
     end
 

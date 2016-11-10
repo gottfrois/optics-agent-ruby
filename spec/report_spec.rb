@@ -9,13 +9,14 @@ include Apollo::Optics::Proto
 describe Report do
   it "can represent a simple query" do
     query = Query.new
-    query.report_field 'Person', 'firstName', 1, 1.1
-    query.report_field 'Person', 'lastName', 1, 1.1
-    query.report_field 'Query', 'person', 1, 1.22
+    query.report_field 'Person', 'firstName', 1, 0.1
+    query.report_field 'Person', 'lastName', 1.1, 0.1
+    query.report_field 'Query', 'person', 1.2, 0.22
+    query.finish!
     query.document = '{field}'
 
     report = Report.new
-    report.add_query query, {}, 1, 1.25
+    report.add_query query, {}
     report.finish!
 
     expect(report.report).to be_an_instance_of(StatsReport)
@@ -38,20 +39,22 @@ describe Report do
 
   it "can aggregate the results of multiple queries with the same shape" do
     queryOne = Query.new
-    queryOne.report_field 'Person', 'firstName', 1, 1.1
-    queryOne.report_field 'Person', 'lastName', 1, 1.1
-    queryOne.report_field 'Query', 'person', 1, 1.22
+    queryOne.report_field 'Person', 'firstName', 1, 0.1
+    queryOne.report_field 'Person', 'lastName', 1.1, 0.1
+    queryOne.report_field 'Query', 'person', 1.2, 0.22
+    queryOne.finish!
     queryOne.document = '{field}'
 
     queryTwo = Query.new
-    queryTwo.report_field 'Person', 'firstName', 1, 1.05
-    queryTwo.report_field 'Person', 'lastName', 1, 1.05
-    queryTwo.report_field 'Query', 'person', 1, 1.2
+    queryTwo.report_field 'Person', 'firstName', 1, 0.05
+    queryTwo.report_field 'Person', 'lastName', 1.05, 0.05
+    queryTwo.report_field 'Query', 'person', 1.1, 0.20
+    queryTwo.finish!
     queryTwo.document = '{field}'
 
     report = Report.new
-    report.add_query queryOne, {}, 1, 1.1
-    report.add_query queryTwo, {}, 1, 1.1
+    report.add_query queryOne, {}
+    report.add_query queryTwo, {}
     report.finish!
 
     expect(report.report).to be_an_instance_of(StatsReport)
@@ -74,20 +77,22 @@ describe Report do
 
   it "can aggregate the results of multiple queries with a different shape" do
     queryOne = Query.new
-    queryOne.report_field 'Person', 'firstName', 1, 1.1
-    queryOne.report_field 'Person', 'lastName', 1, 1.1
-    queryOne.report_field 'Query', 'person', 1, 1.22
+    queryOne.report_field 'Person', 'firstName', 1, 0.1
+    queryOne.report_field 'Person', 'lastName', 1.1, 0.1
+    queryOne.report_field 'Query', 'person', 1.2, 0.22
+    queryOne.finish!
     queryOne.document = '{fieldOne}'
 
     queryTwo = Query.new
-    queryTwo.report_field 'Person', 'firstName', 1, 1.05
-    queryTwo.report_field 'Person', 'lastName', 1, 1.05
-    queryTwo.report_field 'Query', 'person', 1, 1.02
+    queryTwo.report_field 'Person', 'firstName', 1, 0.05
+    queryTwo.report_field 'Person', 'lastName', 1.05, 0.05
+    queryTwo.report_field 'Query', 'person', 1.1, 0.20
+    queryTwo.finish!
     queryTwo.document = '{fieldTwo}'
 
     report = Report.new
-    report.add_query queryOne, {}, 1, 1.1
-    report.add_query queryTwo, {}, 1, 1.1
+    report.add_query queryOne, {}
+    report.add_query queryTwo, {}
     report.finish!
 
     expect(report.report).to be_an_instance_of(StatsReport)
@@ -110,12 +115,13 @@ describe Report do
 
   it "can decorate it's fields with resultTypes from a schema" do
     query = Query.new
-    query.report_field 'Person', 'firstName', 1, 1.1
-    query.report_field 'Person', 'age', 1, 1.1
+    query.report_field 'Person', 'firstName', 1, 0.1
+    query.report_field 'Person', 'age', 1.1, 0.1
+    query.finish!
     query.document = '{field}'
 
     report = Report.new
-    report.add_query query, {}, 1, 1.25
+    report.add_query query, {}
     report.finish!
 
     person_type = GraphQL::ObjectType.define do
@@ -147,13 +153,14 @@ describe Report do
 
   it "can handle introspection fields" do
     query = Query.new
-    query.report_field 'Query', '__schema', 1, 1.1
-    query.report_field 'Query', '__typename', 1, 1.1
-    query.report_field 'Query', '__type', 1, 1.1
+    query.report_field 'Query', '__schema', 1, 0.1
+    query.report_field 'Query', '__typename', 1.1, 0.1
+    query.report_field 'Query', '__type', 1.2, 1.1
+    query.finish!
     query.document = '{field}'
 
     report = Report.new
-    report.add_query query, {}, 1, 1.25
+    report.add_query query, {}
     report.finish!
 
     query_type = GraphQL::ObjectType.define do
@@ -181,49 +188,53 @@ describe Report do
   end
 
   describe "trace reporting" do
-      it "only sends one trace for two queries of the same shape and latency" do
-        queryOne = Query.new
-        queryOne.document = '{field}'
-
-        queryTwo = Query.new
-        queryTwo.document = '{field}'
-
-        report = Report.new
-        report.add_query queryOne, {}, 1, 1.1
-        report.add_query queryTwo, {}, 1, 1.1
-        report.finish!
-
-        expect(report.traces_to_report.length).to be(1)
+    class QueryMock
+      attr_reader :signature, :duration, :start_time, :end_time
+      def initialize(signature, duration)
+        @signature = signature
+        @duration = duration
+        @start_time = Time.now
+        @end_time = Time.now
       end
 
-      it "sends two traces for two queries of the same shape and different latencies" do
-        queryOne = Query.new
-        queryOne.document = '{field}'
+      def add_to_stats(_); end
+      def each_report(); end
+    end
 
-        queryTwo = Query.new
-        queryTwo.document = '{field}'
+    it "only sends one trace for two queries of the same shape and latency" do
+      queryOne = QueryMock.new '{field}', 1
+      queryTwo = QueryMock.new '{field}', 1
 
-        report = Report.new
-        report.add_query queryOne, {}, 1, 1.1
-        report.add_query queryTwo, {}, 1, 1.2
-        report.finish!
+      report = Report.new
+      report.add_query queryOne, {}
+      report.add_query queryTwo, {}
+      report.finish!
 
-        expect(report.traces_to_report.length).to be(2)
-      end
+      expect(report.traces_to_report.length).to be(1)
+    end
 
-      it "sends two traces for two queries of different shapes and the same latency" do
-        queryOne = Query.new
-        queryOne.document = '{field}'
+    it "sends two traces for two queries of the same shape and different latencies" do
+      queryOne = QueryMock.new '{field}', 1
+      queryTwo = QueryMock.new '{field}', 1.1
 
-        queryTwo = Query.new
-        queryTwo.document = '{field_two}'
+      report = Report.new
+      report.add_query queryOne, {}
+      report.add_query queryTwo, {}
+      report.finish!
 
-        report = Report.new
-        report.add_query queryOne, {}, 1, 1.1
-        report.add_query queryTwo, {}, 1, 1.1
-        report.finish!
+      expect(report.traces_to_report.length).to be(2)
+    end
 
-        expect(report.traces_to_report.length).to be(2)
-      end
+    it "sends two traces for two queries of different shapes and the same latency" do
+      queryOne = QueryMock.new '{fieldOne}', 1
+      queryTwo = QueryMock.new '{fieldTwo}', 1
+
+      report = Report.new
+      report.add_query queryOne, {}
+      report.add_query queryTwo, {}
+      report.finish!
+
+      expect(report.traces_to_report.length).to be(2)
+    end
   end
 end

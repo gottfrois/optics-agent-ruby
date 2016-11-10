@@ -5,12 +5,14 @@ module OpticsAgent
       # However, we could also use it to tell people if they've set things up wrong.
       return next_middleware.call unless query_context[:optics_agent]
 
-      start_time = Time.now
+      query = query_context[:optics_agent].query
+
+      start_offset = query.duration_so_far
       result = next_middleware.call
-      end_time = Time.now
+      duration = query.duration_so_far - start_offset
 
       query = query_context[:optics_agent].query
-      query.report_field(parent_type.to_s, field_definition.name, start_time, end_time)
+      query.report_field(parent_type.to_s, field_definition.name, start_offset, duration)
 
       result
     end

@@ -10,11 +10,11 @@ module OpticsAgent::Reporting
 
     attr_accessor :report
 
-    def initialize(query, rack_env, start_time, end_time)
+    def initialize(query, rack_env)
       trace = Trace.new({
-        start_time: generate_timestamp(start_time),
-        end_time: generate_timestamp(end_time),
-        duration_ns: duration_nanos(start_time, end_time),
+        start_time: generate_timestamp(query.start_time),
+        end_time: generate_timestamp(query.end_time),
+        duration_ns: duration_nanos(query.duration),
         signature: query.signature
       })
 
@@ -31,11 +31,11 @@ module OpticsAgent::Reporting
       })
 
       nodes = []
-      query.each_report do |type_name, field_name, field_start_time, field_end_time|
+      query.each_report do |type_name, field_name, start_offset, duration|
         nodes << Trace::Node.new({
           field_name: "#{type_name}.#{field_name}",
-          start_time: duration_nanos(start_time, field_start_time),
-          end_time: duration_nanos(start_time, field_end_time)
+          start_time: duration_nanos(start_offset),
+          end_time: duration_nanos(start_offset + duration)
         })
       end
       trace.execute = Trace::Node.new({

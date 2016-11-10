@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'google-protobuf', '~> 3.1.0'
   s.add_runtime_dependency 'faraday', '~> 0.9.2'
   s.add_runtime_dependency 'net-http-persistent', '~> 2.0.0'
+  s.add_runtime_dependency 'hitimes', '~> 1.2.4'
 
   s.add_development_dependency 'rake', '~> 11.3.0'
   s.add_development_dependency 'rspec', '~> 3.5.0'

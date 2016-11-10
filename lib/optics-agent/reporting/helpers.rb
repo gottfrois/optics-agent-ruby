@@ -11,13 +11,16 @@ module OpticsAgent::Reporting
   def generate_timestamp(time)
     Apollo::Optics::Proto::Timestamp.new({
       seconds: time.to_i,
-      nanos: time.to_i % 1 * 1e9
+      nanos: duration_nanos(time.to_i % 1)
     });
   end
 
-  def duration_nanos(start_time, end_time)
-    throw "start_time before end_time" if (start_time > end_time)
-    ((end_time - start_time) * 1e9).to_i
+  def duration_nanos(duration_in_seconds)
+    (duration_in_seconds * 1e9).to_i
+  end
+
+  def duration_micros(duration_in_seconds)
+    (duration_in_seconds * 1e6).to_i
   end
 
   # XXX: implement
@@ -29,12 +32,11 @@ module OpticsAgent::Reporting
     }
   end
 
-  def add_latency(counts, start_time, end_time)
-    counts[latency_bucket_for_times(start_time, end_time)] += 1
+  def add_latency(counts, duration_in_seconds)
+    counts[latency_bucket_for_duration(duration_in_seconds)] += 1
   end
 
-  def latency_bucket_for_times(start_time, end_time)
-    micros = (end_time - start_time) * 1e6
-    latency_bucket(micros)
+  def latency_bucket_for_duration(duration_in_seconds)
+    latency_bucket(duration_micros(duration_in_seconds))
   end
 end
