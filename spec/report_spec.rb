@@ -180,4 +180,50 @@ describe Report do
     expect(typename_stats.returnType).to eq('Query')
   end
 
+  describe "trace reporting" do
+      it "only sends one trace for two queries of the same shape and latency" do
+        queryOne = Query.new
+        queryOne.document = '{field}'
+
+        queryTwo = Query.new
+        queryTwo.document = '{field}'
+
+        report = Report.new
+        report.add_query queryOne, {}, 1, 1.1
+        report.add_query queryTwo, {}, 1, 1.1
+        report.finish!
+
+        expect(report.traces_to_report.length).to be(1)
+      end
+
+      it "sends two traces for two queries of the same shape and different latencies" do
+        queryOne = Query.new
+        queryOne.document = '{field}'
+
+        queryTwo = Query.new
+        queryTwo.document = '{field}'
+
+        report = Report.new
+        report.add_query queryOne, {}, 1, 1.1
+        report.add_query queryTwo, {}, 1, 1.2
+        report.finish!
+
+        expect(report.traces_to_report.length).to be(2)
+      end
+
+      it "sends two traces for two queries of different shapes and the same latency" do
+        queryOne = Query.new
+        queryOne.document = '{field}'
+
+        queryTwo = Query.new
+        queryTwo.document = '{field_two}'
+
+        report = Report.new
+        report.add_query queryOne, {}, 1, 1.1
+        report.add_query queryTwo, {}, 1, 1.1
+        report.finish!
+
+        expect(report.traces_to_report.length).to be(2)
+      end
+  end
 end

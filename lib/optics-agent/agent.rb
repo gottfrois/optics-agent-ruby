@@ -76,6 +76,7 @@ module OpticsAgent
           sleep @report_interval_ms / 1000.0
           debug "running reporting job"
           ReportJob.new.perform(self)
+          debug "finished running reporting job"
         end
       end
     end

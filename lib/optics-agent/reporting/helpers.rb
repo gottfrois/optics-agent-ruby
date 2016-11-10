@@ -30,8 +30,11 @@ module OpticsAgent::Reporting
   end
 
   def add_latency(counts, start_time, end_time)
+    counts[latency_bucket_for_times(start_time, end_time)] += 1
+  end
+
+  def latency_bucket_for_times(start_time, end_time)
     micros = (end_time - start_time) * 1e6
-    bucket = latency_bucket(micros)
-    counts[bucket] += 1
+    latency_bucket(micros)
   end
 end

@@ -11,7 +11,8 @@ module OpticsAgent::Reporting
     include OpticsAgent::Reporting
     include OpticsAgent::Normalization
 
-    attr_accessor :report
+    attr_reader :report
+    attr_reader :traces_to_report
 
     def initialize
       # internal report that we encapsulate
@@ -21,6 +22,8 @@ module OpticsAgent::Reporting
         }),
         start_time: generate_timestamp(Time.now)
       })
+
+      @traces_to_report = []
     end
 
     def finish!
@@ -29,20 +32,26 @@ module OpticsAgent::Reporting
     end
 
     def send_with(agent)
+      agent.debug do
+        n_queries = 0
+        @report.per_signature.values.each do |signature_stats|
+          signature_stats.per_client_name.values.each do |client_stats|
+            n_queries += client_stats.count_per_version.values.reduce(&:+)
+          end
+        end
+        "Sending #{n_queries} queries and #{@traces_to_report.length} traces"
+      end
       self.finish!
+      @traces_to_report.each do |trace|
+        trace.send_with(agent)
+      end
       agent.send_message('/api/ss/stats', @report)
     end
 
-    # XXX: record timing / client
     def add_query(query, rack_env, start_time, end_time)
       @report.per_signature[query.signature] ||= StatsPerSignature.new
       signature_stats = @report.per_signature[query.signature]
 
-      add_client_stats(signature_stats, rack_env, start_time, end_time)
-      query.add_to_stats(signature_stats)
-    end
-
-    def add_client_stats(signature_stats, rack_env, start_time, end_time)
       info = client_info(rack_env)
       signature_stats.per_client_name[info[:client_name]] ||= StatsPerClientName.new({
         latency_count: empty_latency_count,
@@ -52,9 +61,18 @@ module OpticsAgent::Reporting
 
       # XXX: handle errors
       add_latency(client_stats.latency_count, start_time, end_time)
-
       client_stats.count_per_version[info[:client_version]] ||= 0
       client_stats.count_per_version[info[:client_version]] += 1
+
+      query.add_to_stats(signature_stats)
+
+      bucket = latency_bucket_for_times(start_time, end_time)
+
+      # Is this the first query we've seen in this reporting period and
+      # latency bucket? In which case we want to send a trace
+      if (client_stats.latency_count[bucket] == 1)
+        @traces_to_report << QueryTrace.new(query, rack_env, start_time, end_time)
+      end
     end
 
     # take a graphql schema and add returnTypes to all the fields on our report
