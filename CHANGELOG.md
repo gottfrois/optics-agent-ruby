@@ -1,5 +1,8 @@
 ### vNEXT
 
+ - Sample the traces we report [Issue #20](https://github.com/apollostack/optics-agent-ruby/pull/20), rather than reporting a trace for every query.
+
+
 ### v0.3.1
 
 - Be more aggressive about waiting until the first request to spawn the reporting thread; to achieve better behaviour on pre-forking webservers such as Unicorn and Puma.
