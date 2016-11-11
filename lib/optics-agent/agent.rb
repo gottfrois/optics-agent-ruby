@@ -1,4 +1,3 @@
-require 'singleton'
 require 'optics-agent/rack-middleware'
 require 'optics-agent/graphql-middleware'
 require 'optics-agent/reporting/report_job'
@@ -8,13 +7,7 @@ require 'net/http'
 require 'faraday'
 
 module OpticsAgent
-
-  # XXX: this is a class but acts as a singleton right now.
-  # Need to figure out how to pass the agent into the middleware
-  #   (for instance we could dynamically generate a middleware class,
-  #    or ask the user to pass the agent as an option) to avoid it
   class Agent
-    include Singleton
     include OpticsAgent::Reporting
 
     attr_reader :schema, :report_traces
@@ -106,6 +99,9 @@ Either configure it or use the OPTICS_API_KEY environment variable.
     end
 
     def rack_middleware
+      # We need to pass ourselves to the class we return here because
+      # rack will instanciate it. (See comment at the top of RackMiddleware)
+      OpticsAgent::RackMiddleware.agent = self
       OpticsAgent::RackMiddleware
     end
 

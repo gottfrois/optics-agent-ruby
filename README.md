@@ -49,7 +49,7 @@ Create an agent
 
 ```ruby
 # we expect one day there'll be some options
-agent = OpticsAgent::Agent.instance
+agent = OpticsAgent::Agent.new
 # see above for configuration options
 agent.configure do
   debug true
@@ -98,7 +98,7 @@ module YourApplicationRails
   class Application < Rails::Application
     # ...
 
-    config.optics_agent = OpticsAgent::Agent.instance
+    config.optics_agent = OpticsAgent::Agent.new
     # see above for configuration options
     config.optics_agent.configure do
       debug true

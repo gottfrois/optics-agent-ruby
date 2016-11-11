@@ -2,13 +2,21 @@ require 'optics-agent/agent'
 require 'optics-agent/reporting/query'
 module OpticsAgent
   class RackMiddleware
+    # Right now we assume there'll only be a single rack middleware in an
+    # app, and set the agent via a class attribute. This means that in theory
+    # you could use more than one agent, but at most one middleware.
+    # In the future, if we see a need for more than one middleware, we could
+    # probably just copy the class when calling `agent.rack_middleware`
+    class << self
+      attr_accessor :agent
+    end
+
     def initialize(app, options={})
       @app = app
     end
 
     def call(env)
-      # XXX: figure out a way to pass this in here
-      agent = OpticsAgent::Agent.instance
+      agent = self.class.agent
       agent.ensure_reporting!
       agent.debug { "rack-middleware: request started" }
 
@@ -17,10 +25,9 @@ module OpticsAgent
       # Attach so resolver middleware can access
       env[:optics_agent] = RackAgent.new(agent, query)
 
+
       result = @app.call(env)
 
-      # XXX: this approach means if the user forgets to call with_document
-      # we just never log queries. Can we detect if the request is a graphql one?
       agent.debug { "rack-middleware: request finished" }
       if (query.document)
         agent.debug { "rack-middleware: adding query to agent" }
