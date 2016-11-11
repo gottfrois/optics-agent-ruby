@@ -25,22 +25,26 @@ describe Instrumenters::Field do
       end
     end
 
+    instrumenter = Instrumenters::Field.new
+    instrumenter.agent = true
     schema = GraphQL::Schema.define do
       query query_type
-      instrument :field, Instrumenters::Field.new
+      instrument :field, instrumenter
     end
 
     query = spy("query")
+    allow(query).to receive(:duration_so_far).and_return(1.0)
+
     schema.execute('{ person { firstName lastName } }', {
       context: { optics_agent: OpenStruct.new(query: query) }
     })
 
     expect(query).to have_received(:report_field).exactly(3).times
     expect(query).to have_received(:report_field)
-      .with('Query', 'person', be_instance_of(Time), be_instance_of(Time))
+      .with('Query', 'person', be_instance_of(Float), be_instance_of(Float))
     expect(query).to have_received(:report_field)
-      .with('Person', 'firstName', be_instance_of(Time), be_instance_of(Time))
+      .with('Person', 'firstName', be_instance_of(Float), be_instance_of(Float))
     expect(query).to have_received(:report_field)
-      .with('Person', 'lastName', be_instance_of(Time), be_instance_of(Time))
+      .with('Person', 'lastName', be_instance_of(Float), be_instance_of(Float))
   end
 end

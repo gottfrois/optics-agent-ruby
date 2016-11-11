@@ -1,5 +1,4 @@
 require 'optics-agent/rack-middleware'
-require 'optics-agent/graphql-middleware'
 require 'optics-agent/instrumenters/field'
 require 'optics-agent/reporting/report_job'
 require 'optics-agent/reporting/schema_job'

@@ -1,5 +1,3 @@
-require 'optics-agent/graphql-middleware'
-
 module OpticsAgent
   module Instrumenters
     class Field
@@ -9,7 +7,7 @@ module OpticsAgent
         old_resolve_proc = field.resolve_proc
         new_resolve_proc = ->(obj, args, ctx) {
           if @agent
-            self.class.middleware(@agent, type, obj, field, args, ctx, ->() { old_resolve_proc.call(obj, args, ctx) })
+            middleware(@agent, type, obj, field, args, ctx, ->() { old_resolve_proc.call(obj, args, ctx) })
           else
             old_resolve_proc.call(obj, args, ctx)
           end
@@ -20,9 +18,7 @@ module OpticsAgent
         end
       end
 
-      # Slightly weird use of a class method to share code w/ older middleware
-      # Remove this when middleware is removed
-      def self.middleware(agent, parent_type, parent_object, field_definition, field_args, query_context, next_middleware)
+      def middleware(agent, parent_type, parent_object, field_definition, field_args, query_context, next_middleware)
         agent_context = query_context[:optics_agent]
 
         unless agent_context
