@@ -18,7 +18,7 @@ module OpticsAgent::GraphQLSchemaExtensions
 
     instrumenter = @instrumenter
     super **kwargs do
-      instance_eval(&block)
+      instance_eval(&block) if block
       instrument :field, instrumenter
     end
   end

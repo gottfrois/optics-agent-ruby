@@ -166,20 +166,22 @@ Use the `schema` configuration setting, or call `agent.instrument_schema`
   end
 
   class Configuration
-    DEFAULTS = {
-      schema: nil,
-      debug: false,
-      disable_reporting: false,
-      print_reports: false,
-      report_traces: true,
-      schema_report_delay_ms: 10 * 1000,
-      report_interval_ms: 60 * 1000,
-      api_key: ENV['OPTICS_API_KEY'],
-      endpoint_url: ENV['OPTICS_ENDPOINT_URL'] || 'https://optics-report.apollodata.com'
-    }
+    def self.defaults
+      {
+        schema: nil,
+        debug: false,
+        disable_reporting: false,
+        print_reports: false,
+        report_traces: true,
+        schema_report_delay_ms: 10 * 1000,
+        report_interval_ms: 60 * 1000,
+        api_key: ENV['OPTICS_API_KEY'],
+        endpoint_url: ENV['OPTICS_ENDPOINT_URL'] || 'https://optics-report.apollodata.com'
+      }
+    end
 
     # Allow e.g. `debug false` == `debug = false` in configuration blocks
-    DEFAULTS.each_key do |key|
+    defaults.each_key do |key|
       define_method key, ->(*maybe_value) do
         if (maybe_value.length === 1)
           self.instance_variable_set("@#{key}", maybe_value[0])
@@ -192,7 +194,7 @@ Use the `schema` configuration setting, or call `agent.instrument_schema`
     end
 
     def initialize
-      DEFAULTS.each { |key, value| self.send(key, value) }
+      self.class.defaults.each { |key, value| self.send(key, value) }
     end
   end
 end

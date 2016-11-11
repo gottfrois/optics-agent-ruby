@@ -20,21 +20,14 @@ You'll need to run your app with the `OPTICS_API_KEY` environment variable set (
 
 ## Rails Setup
 
-Create an agent in `config/application.rb`, and register the rack middleware:
+Create an agent in `config/initializers/optics_agent.rb`, and register the rack middleware:
 ```ruby
-module YourApplicationRails
-  class Application < Rails::Application
-    # ...
-
-    config.optics_agent = OpticsAgent::Agent.new
-    # see below for configuration options, at a minimum pass in your schema
-    config.optics_agent.configure do
-      schema MySchema
-    end
-    config.middleware.use config.optics_agent.rack_middleware
-  end
+optics_agent = OpticsAgent::Agent.new
+optics_agent.configure do
+  schema YourSchema
+  # See other configuration options below
 end
-
+Rails.application.config.middleware.use optics_agent.rack_middleware
 ```
 
 Register Optics Agent on the GraphQL context within your `graphql` action as below:
