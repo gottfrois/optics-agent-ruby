@@ -1,10 +1,16 @@
 ### vNEXT
 
+### v0.4.0
+
 #### Breaking
 
-- Use `agent.configure`, with a [DSL](https://github.com/apollostack/optics-agent-ruby#configuration) rather than `agent.set_options`
+- Requires `graphl-ruby@1.1.0`
 
-- Use `OpticsAgent::Agent.new` rather than `OpticsAgent::Agent.instance`
+- We have a new configuration setup, read it [here](https://github.com/apollostack/optics-agent-ruby#rails-setup)
+
+  - Use `OpticsAgent::Agent.new` rather than `OpticsAgent::Agent.instance`
+
+  - Use `agent.configure`, with a [DSL](https://github.com/apollostack/optics-agent-ruby#configuration) rather than `agent.set_options`
 
 #### New features
 
