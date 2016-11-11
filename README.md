@@ -69,7 +69,8 @@ agent.configure do
   # The schema you wish to instrument
   schema YourSchema
 
-  # Your API key for the Optics service. This defaults to the OPTICS_API_KEY environment variable, but can be overridden here.
+  # Your API key for the Optics service. This defaults to the OPTICS_API_KEY
+  # environment variable, but can be overridden here.
   api_key ENV['OPTICS_API_KEY']
 
   # Log detailed debugging messages
@@ -84,13 +85,17 @@ agent.configure do
   # Send detailed traces along with usage reports
   report_traces true
 
-  # How long to wait before sending a schema report after startup, in, milliseconds
+  # How long to wait before sending a schema report after startup, in
+  # milliseconds
   schema_report_delay_ms 10 * 1000
 
-  # How often to send reports in milliseconds. Defaults to 1 minute. Minimum 10 seconds. You shouldn't need to set this unless you are debugging.
+  # How often to send reports in milliseconds. Defaults to 1 minute.
+  # You shouldn't need to set this unless you are debugging.
   report_interval_ms 60 * 1000
 
-  # Where to send the reports. Defaults to the production Optics endpoint, or the `OPTICS_ENDPOINT_URL` environment variable if it is set. You shouldn't need to set this unless you are debugging
+  # Where to send the reports. Defaults to the production Optics endpoint,
+  # or the `OPTICS_ENDPOINT_URL` environment variable if it is set.
+  # You shouldn't need to set this unless you are debugging
   endpoint_url 'https://optics-report.apollodata.com'
 end
 ```
