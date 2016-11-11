@@ -37,6 +37,7 @@ Possible options are:
   - `debug [false]` - Log detailed debugging messages
   - `disable_reporting [false]` - Don't report anything to Optics (useful for testing)
   - `print_reports [false]` - Print JSON versions of the data sent to Optics to the log
+  - `report_traces [true]` - Send detailed traces along with usage reports
   - `schema_report_delay_ms [10000]` - How long to wait before sending a schema report after startup, in, milliseconds
   - `report_interval_ms [60000]` - How often to send reports in milliseconds. Defaults to 1 minute. Minimum 10 seconds. You shouldn't need to set this unless you are debugging.
 

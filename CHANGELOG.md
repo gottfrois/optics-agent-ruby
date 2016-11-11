@@ -4,6 +4,7 @@
 
  - Use `hitimes`, a high resolution timer library [Issue #21](https://github.com/apollostack/optics-agent-ruby/issues/21).
 
+ - You can now disable trace reporting with the `report_traces` option
 
 ### v0.3.1
 
