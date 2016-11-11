@@ -25,7 +25,7 @@ module OpticsAgent
       @configuration.instance_eval(&block)
 
       if @configuration.schema && @schema != @configuration.schema
-        instrument_schema(@configuration.schema, no_middleware: true)
+        instrument_schema(@configuration.schema)
       end
     end
 
@@ -33,14 +33,11 @@ module OpticsAgent
       @configuration.disable_reporting || !@configuration.api_key || !@schema
     end
 
-    # Like instrument_schema, but intended to be called from inside a Schema.define
-    # block, so we can call `schema.instrument` (we can't call when a schema is defined)
-    def instrument(schema)
-      debug 'adding instrumentation to schema'
-      schema.instrument(:field, Instrumenters::Field.new(self))
+    def report_traces?
+      @configuration.report_traces
     end
 
-    def instrument_schema(schema, no_middleware: false)
+    def instrument_schema(schema)
       unless @configuration.api_key
         warn """No api_key set.
 Either configure it or use the OPTICS_API_KEY environment variable.
@@ -48,9 +45,16 @@ Either configure it or use the OPTICS_API_KEY environment variable.
         return
       end
 
+      if @schema
+        warn """Agent has already instrumented a schema.
+Perhaps you are calling both `agent.configure { schema YourSchema }` and
+`agent.instrument_schema YourSchema`?
+"""
+        return
+      end
+
       @schema = schema
-      debug "adding middleware to schema"
-      schema.middleware << graphql_middleware unless no_middleware
+      @schema._attach_optics_agent(self)
 
       unless disabled?
         debug "spawning schema thread"
@@ -124,7 +128,7 @@ Use the `schema` configuration setting, or call `agent.instrument_schema`
     end
 
     def graphql_middleware
-      OpticsAgent::GraphqlMiddleware.new(self)
+      warn "You no longer need to pass the optics agent middleware, it now attaches itself"
     end
 
     def send_message(path, message)
@@ -151,7 +155,7 @@ Use the `schema` configuration setting, or call `agent.instrument_schema`
     end
 
     def warn(message = nil)
-      log message
+      log "WARNING: #{message}"
     end
 
     def debug(message = nil)

@@ -4,7 +4,7 @@ module OpticsAgent::Reporting
   class ReportJob
     def perform(agent)
       begin
-        report = OpticsAgent::Reporting::Report.new(report_traces: agent.report_traces)
+        report = OpticsAgent::Reporting::Report.new(report_traces: agent.report_traces?)
         agent.clear_query_queue.each do |item|
           report.add_query(*item)
         end

@@ -3,14 +3,16 @@ require 'optics-agent/graphql-middleware'
 module OpticsAgent
   module Instrumenters
     class Field
-      def initialize(agent)
-        @agent = agent
-      end
+      attr_accessor :agent
 
       def instrument(type, field)
         old_resolve_proc = field.resolve_proc
         new_resolve_proc = ->(obj, args, ctx) {
-          self.class.middleware(@agent, type, obj, field, args, ctx, ->() { old_resolve_proc.call(obj, args, ctx) })
+          if @agent
+            self.class.middleware(@agent, type, obj, field, args, ctx, ->() { old_resolve_proc.call(obj, args, ctx) })
+          else
+            old_resolve_proc.call(obj, args, ctx)
+          end
         }
 
         field.redefine do
