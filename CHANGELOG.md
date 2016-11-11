@@ -1,10 +1,18 @@
 ### vNEXT
 
- - Sample the traces we report [Issue #20](https://github.com/apollostack/optics-agent-ruby/issues/20), rather than reporting a trace for every query.
+#### Breaking
 
- - Use `hitimes`, a high resolution timer library [Issue #21](https://github.com/apollostack/optics-agent-ruby/issues/21).
+- Use `agent.configure`, with a [DSL](https://github.com/apollostack/optics-agent-ruby#configuration) rather than `agent.set_options`
 
- - You can now disable trace reporting with the `report_traces` option
+- Use `OpticsAgent::Agent.new` rather than `OpticsAgent::Agent.instance`
+
+#### New features
+
+- Sample the traces we report [Issue #20](https://github.com/apollostack/optics-agent-ruby/issues/20), rather than reporting a trace for every query.
+
+- Use `hitimes`, a high resolution timer library [Issue #21](https://github.com/apollostack/optics-agent-ruby/issues/21).
+
+- You can now disable trace reporting with the `report_traces` option
 
 ### v0.3.1
 
