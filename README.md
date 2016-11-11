@@ -115,7 +115,6 @@ YourSchema = GraphQL::Schema.define do
 
   agent.instrument self
 end
-agent.instrument_schema(YourSchema, no_middleware: true
 ```
 
 Register Optics Agent on the GraphQL context within your `graphql` action as below:

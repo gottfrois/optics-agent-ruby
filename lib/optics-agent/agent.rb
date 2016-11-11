@@ -25,7 +25,7 @@ module OpticsAgent
       @configuration.instance_eval(&block)
 
       if @configuration.schema && @schema != @configuration.schema
-        instrument_schema(@configuration.schema)
+        instrument_schema(@configuration.schema, no_middleware: true)
       end
     end
 
