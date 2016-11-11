@@ -34,7 +34,7 @@ module OpticsAgent
 
     def instrument_schema(schema)
       unless @configuration.api_key
-        log """No api_key set.
+        warn """No api_key set.
 Either configure it or use the OPTICS_API_KEY environment variable.
 """
         return
@@ -59,7 +59,7 @@ Either configure it or use the OPTICS_API_KEY environment variable.
     # is active in the correct process for pre-forking webservers like unicorn
     def ensure_reporting!
       unless @schema
-        log """No schema instrumented.
+        warn """No schema instrumented.
 Use the `schema` configuration setting, or call `agent.instrument_schema`
 """
         return
@@ -116,8 +116,7 @@ Use the `schema` configuration setting, or call `agent.instrument_schema`
     end
 
     def graphql_middleware
-      # graphql middleware doesn't seem to need the agent but certainly could have it
-      OpticsAgent::GraphqlMiddleware.new
+      OpticsAgent::GraphqlMiddleware.new(self)
     end
 
     def send_message(path, message)
@@ -141,6 +140,10 @@ Use the `schema` configuration setting, or call `agent.instrument_schema`
     def log(message = nil)
       message = yield unless message
       puts "optics-agent: #{message}"
+    end
+
+    def warn(message = nil)
+      log message
     end
 
     def debug(message = nil)

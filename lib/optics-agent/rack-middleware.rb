@@ -25,7 +25,6 @@ module OpticsAgent
       # Attach so resolver middleware can access
       env[:optics_agent] = RackAgent.new(agent, query)
 
-
       result = @app.call(env)
 
       agent.debug { "rack-middleware: request finished" }

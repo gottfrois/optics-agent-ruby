@@ -29,7 +29,7 @@ describe GraphqlMiddleware do
       query query_type
     end
 
-    schema.middleware << GraphqlMiddleware.new
+    schema.middleware << GraphqlMiddleware.new(nil)
 
     query = spy("query")
     allow(query).to receive(:duration_so_far).and_return(1.0)
