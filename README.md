@@ -27,10 +27,12 @@ You'll need to run your app with the `OPTICS_API_KEY` environment variable set (
 After creating an agent (see below), you can configure it with
 
 ```rb
-agent.set_options(option: value)
+agent.configure do
+  key value
+end
 ```
 
-Possible options are:
+Possible keys are:
 
   - `api_key` - Your API key for the Optics service. This defaults to the OPTICS_API_KEY environment variable, but can be overridden here.
   - `endpoint_url ['https://optics-report.apollodata.com']` - Where to send the reports. Defaults to the production Optics endpoint, or the `OPTICS_ENDPOINT_URL` environment variable if it is set. You shouldn't need to set this unless you are debugging
@@ -48,6 +50,10 @@ Create an agent
 ```ruby
 # we expect one day there'll be some options
 agent = OpticsAgent::Agent.instance
+# see above for configuration options
+agent.configure do
+  debug true
+end
 ```
 
 Register the Rack middleware (say in a `config.ru`):
@@ -93,6 +99,11 @@ module YourApplicationRails
     # ...
 
     config.optics_agent = OpticsAgent::Agent.instance
+    # see above for configuration options
+    config.optics_agent.configure do
+      debug true
+    end
+
     config.middleware.use config.optics_agent.rack_middleware
   end
 end
