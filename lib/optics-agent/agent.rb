@@ -22,10 +22,14 @@ module OpticsAgent
 
     def configure(&block)
       @configuration.instance_eval(&block)
+
+      if @configuration.schema && @schema != @configuration.schema
+        instrument_schema(@configuration.schema)
+      end
     end
 
     def disabled?
-      @configuration.disable_reporting || !@configuration.api_key
+      @configuration.disable_reporting || !@configuration.api_key || !@schema
     end
 
     def instrument_schema(schema)
@@ -33,7 +37,6 @@ module OpticsAgent
         log """No api_key set.
 Either configure it or use the OPTICS_API_KEY environment variable.
 """
-        @warned_missing_api_key = true
         return
       end
 
@@ -55,6 +58,13 @@ Either configure it or use the OPTICS_API_KEY environment variable.
     # We call this method on every request to ensure that the reporting thread
     # is active in the correct process for pre-forking webservers like unicorn
     def ensure_reporting!
+      unless @schema
+        log """No schema instrumented.
+Use the `schema` configuration setting, or call `agent.instrument_schema`
+"""
+        return
+      end
+
       unless @reporting_thread_active || disabled?
         schedule_report
         @reporting_thread_active = true
@@ -143,6 +153,7 @@ Either configure it or use the OPTICS_API_KEY environment variable.
 
   class Configuration
     DEFAULTS = {
+      schema: nil,
       debug: false,
       disable_reporting: false,
       print_reports: false,

@@ -34,6 +34,7 @@ end
 
 Possible keys are:
 
+  - `schema` - The schema you wish to instrument
   - `api_key` - Your API key for the Optics service. This defaults to the OPTICS_API_KEY environment variable, but can be overridden here.
   - `endpoint_url ['https://optics-report.apollodata.com']` - Where to send the reports. Defaults to the production Optics endpoint, or the `OPTICS_ENDPOINT_URL` environment variable if it is set. You shouldn't need to set this unless you are debugging
   - `debug [false]` - Log detailed debugging messages
@@ -48,11 +49,10 @@ Possible keys are:
 Create an agent
 
 ```ruby
-# we expect one day there'll be some options
 agent = OpticsAgent::Agent.new
 # see above for configuration options
 agent.configure do
-  debug true
+  schema MySchema
 end
 ```
 
@@ -60,12 +60,6 @@ Register the Rack middleware (say in a `config.ru`):
 
 ```ruby
 use agent.rack_middleware
-```
-
-Register the GraphQL middleware:
-
-```ruby
-agent.instrument_schema(YourSchema)
 ```
 
 Add something like this to your route:
@@ -101,19 +95,13 @@ module YourApplicationRails
     config.optics_agent = OpticsAgent::Agent.new
     # see above for configuration options
     config.optics_agent.configure do
-      debug true
+      schema MySchema
     end
 
     config.middleware.use config.optics_agent.rack_middleware
   end
 end
 
-```
-
-Register the GraphQL middleware when you create your schema:
-
-```ruby
-Rails.application.config.optics_agent.instrument_schema(YourSchema)
 ```
 
 Register Optics Agent on the GraphQL context within your `graphql` action as below:
