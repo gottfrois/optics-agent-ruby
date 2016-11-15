@@ -52,7 +52,7 @@ module OpticsAgent::Reporting
       agent.send_message('/api/ss/stats', @report)
     end
 
-    def add_query(query, rack_env)
+    def add_query(query, rack_env = nil)
       @report.per_signature[query.signature] ||= StatsPerSignature.new
       signature_stats = @report.per_signature[query.signature]
 
