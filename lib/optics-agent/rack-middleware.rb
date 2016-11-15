@@ -29,7 +29,7 @@ module OpticsAgent
 
       agent.debug { "rack-middleware: request finished" }
       if (query.document)
-        agent.debug { "rack-middleware: adding query to agent" }
+        agent.debug { "rack-middleware: Adding a query with #{query.reports.length} field reports" }
         query.finish!
         agent.add_query(query, env)
       end

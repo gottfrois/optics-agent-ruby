@@ -17,7 +17,7 @@ module OpticsAgent::Reporting
     extend Forwardable
 
     attr_accessor :document
-    attr_reader :start_time, :end_time
+    attr_reader :start_time, :end_time, :reports
     def_delegators :@interval, :duration, :duration_so_far
 
     def initialize
