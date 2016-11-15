@@ -10,6 +10,12 @@ module OpticsAgent
   class Agent
     include OpticsAgent::Reporting
 
+    class << self
+      attr_accessor :logger
+    end
+
+    self.logger = Logger.new(STDOUT)
+
     attr_reader :schema, :report_traces
 
     def initialize
@@ -150,17 +156,18 @@ Use the `schema` configuration setting, or call `agent.instrument_schema`
 
     def log(message = nil)
       message = yield unless message
-      puts "optics-agent: #{message}"
+      self.class.logger.info "optics-agent: #{message}"
     end
 
     def warn(message = nil)
-      log "WARNING: #{message}"
+      self.class.logger.warn "optics-agent: WARNING: #{message}"
     end
 
+    # Should we be using built in debug levels rather than our own "debug" flag?
     def debug(message = nil)
       if @configuration.debug
         message = yield unless message
-        log "DEBUG: #{message} <#{Process.pid} | #{Thread.current.object_id}>"
+        self.class.logger.info "optics-agent: DEBUG: #{message} <#{Process.pid} | #{Thread.current.object_id}>"
       end
     end
   end
