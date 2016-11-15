@@ -16,7 +16,7 @@ To your `Gemfile`
 
 ### API key
 
-You'll need to run your app with the `OPTICS_API_KEY` environment variable set (or set via `agent.configure`) to the API key of your Apollo Optics service; you can get an API key by setting up a service at https://optics.apollodata.com.
+You'll need to run your app with the `OPTICS_API_KEY` environment variable set (or set via [`agent.configure`](#configuration)) to the API key of your Apollo Optics endpoint; you can get an API key by setting up a endpoint at https://optics.apollodata.com.
 
 ## Rails Setup
 
@@ -30,7 +30,7 @@ end
 Rails.application.config.middleware.use optics_agent.rack_middleware
 ```
 
-Register Optics Agent on the GraphQL context within your `graphql` action as below:
+Register Optics Agent from your on the GraphQL context within your `graphql` action as below:
 ```ruby
 def create
   query_string = params[:query]
@@ -40,6 +40,8 @@ def create
     query_string,
     variables: query_variables,
     context: {
+      # This is the key line: we take the optics_agent passed in from the
+      # Rack environment, give it the query_string, and pass it as context
       optics_agent: env[:optics_agent].with_document(query_string)
     }
   )
