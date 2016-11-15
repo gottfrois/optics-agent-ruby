@@ -5,6 +5,7 @@ require 'optics-agent/reporting/schema_job'
 require 'optics-agent/reporting/query-trace'
 require 'net/http'
 require 'faraday'
+require 'logger'
 
 module OpticsAgent
   class Agent
