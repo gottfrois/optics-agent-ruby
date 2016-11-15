@@ -1,8 +1,13 @@
 ### vNEXT
 
-### v0.4.0
-  - Fix issue where queries did not execute if you mis-configured the agent (now it just warns).
-  - Use the Rails logger if available and allow setting `OpticsAgent::Agent.logger`.
+### v0.4.2
+- Loosened unnecessarily strict dependencies in gemspec
+
+
+### v0.4.1
+- Fix issue where queries did not execute if you mis-configured the agent (now it just warns).
+
+- Use the Rails logger if available and allow setting `OpticsAgent::Agent.logger`.
 
 ### v0.4.0
 
