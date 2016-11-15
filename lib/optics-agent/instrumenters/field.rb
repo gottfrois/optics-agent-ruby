@@ -27,7 +27,8 @@ module OpticsAgent
   when executing your graphql query.
   If you don't want to instrument this query, pass `context: {optics_agent: :skip}`.
   """
-          return
+          # don't warn again for this query
+          agent_context = query_context[:optics_agent] = :skip
         end
 
         # This happens when an introspection query occurs (reporting schema)
