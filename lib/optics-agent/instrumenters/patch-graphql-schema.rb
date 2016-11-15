@@ -4,22 +4,26 @@
 
 require 'graphql'
 require 'optics-agent/instrumenters/field'
+require 'optics-agent/instrumenters/query'
 
 module OpticsAgent::GraphQLSchemaExtensions
   def define(**kwargs, &block)
-    @instrumenter = OpticsAgent::Instrumenters::Field.new
+    @field_instrumenter = OpticsAgent::Instrumenters::Field.new
+    @query_instrumenter = OpticsAgent::Instrumenters::Query.new
 
     class << self
       def _attach_optics_agent(agent)
-        agent.debug "Attaching agent to field instrumenter"
-        @instrumenter.agent = agent
+        agent.debug "Attaching agent to instrumenters"
+        @field_instrumenter.agent = @query_instrumenter.agent = agent
       end
     end
 
-    instrumenter = @instrumenter
+    field_instrumenter = @field_instrumenter
+    query_instrumenter = @query_instrumenter
     super **kwargs do
       instance_eval(&block) if block
-      instrument :field, instrumenter
+      instrument :field, field_instrumenter
+      instrument :query, query_instrumenter
     end
   end
 end
