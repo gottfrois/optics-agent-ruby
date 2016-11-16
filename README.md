@@ -102,6 +102,30 @@ agent.configure do
 end
 ```
 
+## Troubleshooting
+
+The Optics agent is designed to allow your application to continue working, even if the agent is not configured properly.
+
+### No data in Optics
+
+If there is no data being sent to Optics, ensure you've followed the steps above, then check your application logs to look for the following messages:
+
+### Message: No api_key set.
+
+Solution: Get a valid API key from Optics and use the `OPTICS_API_KEY` environment variable, or [configuration](#configuration) to pass it to the agent.
+
+### Message: No schema instrumented
+
+Solution: Ensure you are passing your schema to the agent [configuration](#configuration).
+
+### Message: No agent passed in graphql context
+
+Solution: Ensure you are passing `context: { optics_agent: env[:optics_agent].with_document(query_string) }` where `env` is the Rack request environment, and `query_string` is the string representing your query. See the [setup instructions](#rails-setup) for more details.
+
+### Debugging
+
+You can also use the `debug` [configuration](#configuration) setting to get more detailed debugging information, which may give hints as to what the issue is.
+
 ## Development
 
 ### Running tests
