@@ -63,7 +63,7 @@ You must:
 
 ### Configuration
 
-After creating an agent, you can configure it with:
+After creating an agent, you can configure it with (the values listed are the defaults):
 
 ```rb
 # defaults are show below
