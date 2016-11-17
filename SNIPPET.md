@@ -4,7 +4,7 @@ Install the Rubygem to your `Gemfile`:
 gem 'optics-agent'
 ```
 
-And run 
+And run
 
 ```bash
 bundle install
@@ -17,7 +17,8 @@ Create an agent in `config/initializers/optics_agent.rb`, and register the rack 
 ```ruby
 optics_agent = OpticsAgent::Agent.new
 optics_agent.configure { schema YourSchema }
-Rails.application.config.middleware.use optics_agent.rack_middleware
+Rails.application.config.middleware.use \
+  optics_agent.rack_middleware
 ```
 
 Register Optics Agent on the GraphQL context within your `graphql` action as below:
