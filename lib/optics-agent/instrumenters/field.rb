@@ -13,9 +13,15 @@ module OpticsAgent
           end
         }
 
-        field.redefine do
+        new_field = field.redefine do
           resolve(new_resolve_proc)
         end
+
+        if old_resolve_proc.instance_of? GraphQL::Relay::ConnectionResolve
+          new_field.arguments = field.arguments
+        end
+
+        new_field
       end
 
       def middleware(agent, parent_type, parent_object, field_definition, field_args, query_context, next_middleware)
