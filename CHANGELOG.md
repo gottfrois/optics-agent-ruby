@@ -1,5 +1,8 @@
 ### vNEXT
 
+### v0.4.3
+- Work around issue with graphl-ruby instrumenters and Relay connection fields. (See [#417](https://github.com/rmosolgo/graphql-ruby/issues/417)).
+
 ### v0.4.2
 - Loosened unnecessarily strict dependencies in gemspec
 
