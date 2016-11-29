@@ -1,5 +1,9 @@
 ### vNEXT
 
+### v0.4.4
+
+- Fix issue with `graphql@1.2.5` due to breaking change in visitor API. (Issue [#42](https://github.com/apollostack/optics-agent-ruby/issues/42))
+
 ### v0.4.3
 - Work around issue with graphl-ruby instrumenters and Relay connection fields. (See [#417](https://github.com/rmosolgo/graphql-ruby/issues/417)).
 

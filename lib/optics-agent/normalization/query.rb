@@ -16,14 +16,20 @@ module OpticsAgent
         visitor = Visitor.new(document)
 
         stack = []
-        visitor.enter << -> (_, _) do
-          stack.unshift(
-            arguments: [],
-            directives: [],
-            selections: []
-          )
+        Nodes.constants.each do |constant|
+          mod = Nodes.const_get(constant)
+          next unless mod.is_a? Module
+
+          visitor[mod].enter << -> (_, _) do
+            stack.unshift(
+              arguments: [],
+              directives: [],
+              selections: []
+            )
+          end
+
+          visitor[mod].leave << -> (_, _) { current = stack.shift }
         end
-        visitor.leave << -> (_, _) { current = stack.shift }
 
         visitor[Nodes::Argument].leave << -> (node, parent) do
           stack[0][:arguments] << "#{node.name}:#{genericize_type(node.value)}"
