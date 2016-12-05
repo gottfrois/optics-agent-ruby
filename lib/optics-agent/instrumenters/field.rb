@@ -6,6 +6,7 @@ module OpticsAgent
       def instrument(type, field)
         old_resolve_proc = field.resolve_proc
         new_resolve_proc = ->(obj, args, ctx) {
+          p "resolve_proc #{type.name} #{field.name}"
           if @agent
             middleware(@agent, type, obj, field, args, ctx, ->() { old_resolve_proc.call(obj, args, ctx) })
           else
@@ -13,8 +14,20 @@ module OpticsAgent
           end
         }
 
+        old_lazy_resolve_proc = field.lazy_resolve_proc
+        p "lazy_resolve_proc exists #{type.name} #{field.name}" if old_lazy_resolve_proc
+        new_lazy_resolve_proc = ->(obj, args, ctx) {
+          p "lazy_resolve_proc #{type.name} #{field.name}"
+          if @agent
+            middleware(@agent, type, obj, field, args, ctx, ->() { old_lazy_resolve_proc.call(obj, args, ctx) })
+          else
+            old_resolve_proc.call(obj, args, ctx)
+          end
+        }
+
         new_field = field.redefine do
           resolve(new_resolve_proc)
+          lazy_resolve(new_lazy_resolve_proc)
         end
 
         if old_resolve_proc.instance_of? GraphQL::Relay::ConnectionResolve
