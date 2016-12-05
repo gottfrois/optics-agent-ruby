@@ -3,10 +3,11 @@ require 'optics-agent/query_context'
 module OpticsAgent
   module Instrumenters
     class Query
-      attr_accessor :agent
+      def initialize(agent)
+        @agent = agent
+      end
 
       def before_query(query)
-        return unless @agent
         query_context = query.context[:optics_agent]
         return if query_context == :skip
 
@@ -35,7 +36,7 @@ If you don't want to instrument this query, pass `context: {optics_agent: :skip}
         query_context = query.context[:optics_agent]
         return if query_context == :skip
 
-        agent.debug { "query_instrumenter: query completed" }
+        @agent.debug { "query_instrumenter: query completed" }
         query_context.query_finished!
       end
     end

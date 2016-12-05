@@ -3,6 +3,8 @@ require 'optics-agent/instrumenters/field'
 require 'optics-agent/reporting/report_job'
 require 'optics-agent/reporting/schema_job'
 require 'optics-agent/reporting/query-trace'
+require 'optics-agent/instrumenters/query'
+require 'optics-agent/instrumenters/field'
 require 'net/http'
 require 'faraday'
 require 'logger'
@@ -60,9 +62,12 @@ Perhaps you are calling both `agent.configure { schema YourSchema }` and
       end
 
       @schema = schema
-      @schema._attach_optics_agent(self)
-
       unless disabled?
+        @query_instrumenter = Instrumenters::Query.new(self)
+        @schema.instrument :query, @query_instrumenter
+        @field_instrumenter = Instrumenters::Field.new(self)
+        @schema.instrument :field, @field_instrumenter
+
         debug "spawning schema thread"
         Thread.new do
           debug "schema thread spawned"

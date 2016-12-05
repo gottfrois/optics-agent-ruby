@@ -1,16 +1,14 @@
 module OpticsAgent
   module Instrumenters
     class Field
-      attr_accessor :agent
+      def initialize(agent)
+        @agent = agent
+      end
 
       def instrument(type, field)
         old_resolve_proc = field.resolve_proc
         new_resolve_proc = ->(obj, args, ctx) {
-          if @agent
-            middleware(@agent, type, obj, field, args, ctx, ->() { old_resolve_proc.call(obj, args, ctx) })
-          else
-            old_resolve_proc.call(obj, args, ctx)
-          end
+          middleware(type, obj, field, args, ctx, ->() { old_resolve_proc.call(obj, args, ctx) })
         }
 
         new_field = field.redefine do
@@ -20,7 +18,7 @@ module OpticsAgent
         new_field
       end
 
-      def middleware(agent, parent_type, parent_object, field_definition, field_args, query_context, next_middleware)
+      def middleware(parent_type, parent_object, field_definition, field_args, query_context, next_middleware)
         agent_context = query_context[:optics_agent]
 
         # This happens when an introspection query occurs (reporting schema)

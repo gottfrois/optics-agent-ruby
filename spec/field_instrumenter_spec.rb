@@ -25,8 +25,7 @@ describe Instrumenters::Field do
       end
     end
 
-    instrumenter = Instrumenters::Field.new
-    instrumenter.agent = true
+    instrumenter = Instrumenters::Field.new(true)
     schema = GraphQL::Schema.define do
       query query_type
       instrument :field, instrumenter
