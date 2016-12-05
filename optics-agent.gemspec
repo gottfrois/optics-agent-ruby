@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
     'http://rubygems.org/gems/optics-agent'
   s.license     = 'MIT'
 
-  s.add_runtime_dependency 'graphql', '~> 1.1'
+  s.add_runtime_dependency 'graphql', '~> 1.2', '>= 1.2.6'
   s.add_runtime_dependency 'google-protobuf', '~> 3.1'
   s.add_runtime_dependency 'faraday', '~> 0.9', '>= 0.9.2'
   s.add_runtime_dependency 'net-http-persistent', '~> 2.0', '>= 2.0.0'

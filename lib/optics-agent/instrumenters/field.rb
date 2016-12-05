@@ -17,10 +17,6 @@ module OpticsAgent
           resolve(new_resolve_proc)
         end
 
-        if old_resolve_proc.instance_of? GraphQL::Relay::ConnectionResolve
-          new_field.arguments = field.arguments
-        end
-
         new_field
       end
 
