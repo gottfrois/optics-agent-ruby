@@ -6,12 +6,15 @@ module OpticsAgent
       def instrument(type, field)
         old_resolve_proc = field.resolve_proc
         new_resolve_proc = ->(obj, args, ctx) {
-          p "resolve_proc #{type.name} #{field.name}"
           if @agent
-            middleware(@agent, type, obj, field, args, ctx, ->() { old_resolve_proc.call(obj, args, ctx) })
+            ret = middleware(@agent, type, obj, field, args, ctx, ->() { old_resolve_proc.call(obj, args, ctx) })
+            p "resolve_proc #{type.name} #{field.name} #{@agent.schema.lazy?(ret)}"
+            ret
           else
             old_resolve_proc.call(obj, args, ctx)
           end
+
+
         }
 
         old_lazy_resolve_proc = field.lazy_resolve_proc
