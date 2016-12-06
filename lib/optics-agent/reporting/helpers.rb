@@ -4,7 +4,7 @@ module OpticsAgent::Reporting
   def generate_report_header
     # XXX: fill out
     Apollo::Optics::Proto::ReportHeader.new({
-      agent_version: '0'
+      agent_version: "optics-agent-ruby #{OpticsAgent::VERSION}"
     })
   end
 

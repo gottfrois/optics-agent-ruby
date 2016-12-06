@@ -1,6 +1,9 @@
+$LOAD_PATH.push File.expand_path("../lib", __FILE__)
+require "optics-agent/version"
+
 Gem::Specification.new do |s|
   s.name        = 'optics-agent'
-  s.version     = '0.4.4'
+  s.version     = OpticsAgent::VERSION
   s.date        = '2016-10-06'
   s.summary     = "An Agent for Apollo Optics"
   s.description = "An Agent for Apollo Optics, http://optics.apollodata.com"
