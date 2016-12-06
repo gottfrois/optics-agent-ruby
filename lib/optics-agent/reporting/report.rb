@@ -31,8 +31,8 @@ module OpticsAgent::Reporting
     end
 
     def finish!
-      @report.end_time ||= generate_timestamp(Time.now)
-      @report.realtime_duration || duration_nanos(@interval.stop)
+      @report.end_time = generate_timestamp(Time.now)
+      @report.realtime_duration = duration_nanos(@interval.stop)
     end
 
     def send_with(agent)

@@ -11,7 +11,7 @@ module OpticsAgent::Reporting
   def generate_timestamp(time)
     Apollo::Optics::Proto::Timestamp.new({
       seconds: time.to_i,
-      nanos: duration_nanos(time.to_i % 1)
+      nanos: duration_nanos(time.to_f % 1)
     });
   end
 
