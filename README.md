@@ -1,5 +1,5 @@
 # optics-agent-ruby
-Optics Agent for GraphQL Monitoring in Ruby.
+Apollo Optics agent for GraphQL Monitoring in Ruby.
 
 [![Gem Version](https://badge.fury.io/rb/optics-agent.svg)](https://badge.fury.io/rb/optics-agent) [![Build Status](https://travis-ci.org/apollostack/optics-agent-ruby.svg?branch=master)](https://travis-ci.org/apollostack/optics-agent-ruby)
 
@@ -30,7 +30,7 @@ end
 Rails.application.config.middleware.use optics_agent.rack_middleware
 ```
 
-Register Optics Agent from your on the GraphQL context within your `graphql` action as below:
+Register Apollo Optics agent from your on the GraphQL context within your `graphql` action as below:
 ```ruby
 def create
   query_string = params[:query]
@@ -104,7 +104,7 @@ end
 
 ## Troubleshooting
 
-The Optics agent is designed to allow your application to continue working, even if the agent is not configured properly.
+The Apollo Optics agent is designed to allow your application to continue working, even if the agent is not configured properly.
 
 ### No data in Optics
 
