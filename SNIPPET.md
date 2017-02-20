@@ -1,6 +1,3 @@
-Optics is incompatible with Ruby 2.4.0 until the next release of
-the `google-protobuf` gem ([upstream issue](https://github.com/google/protobuf/issues/2541)).
-
 Install the Rubygem to your `Gemfile`:
 
 ```ruby
