@@ -14,11 +14,11 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
 
   s.add_runtime_dependency 'graphql', '~> 1.1'
-  s.add_runtime_dependency 'google-protobuf', '~> 3.1'
-  s.add_runtime_dependency 'faraday', '~> 0.9', '>= 0.9.2'
-  s.add_runtime_dependency 'net-http-persistent', '~> 2.0', '>= 2.0.0'
-  s.add_runtime_dependency 'hitimes', '~> 1.2', '>= 1.2.4'
+  s.add_runtime_dependency 'google-protobuf', '~> 3.2'
+  s.add_runtime_dependency 'faraday', '~> 0.11'
+  s.add_runtime_dependency 'net-http-persistent', '~> 2.0'
+  s.add_runtime_dependency 'hitimes', '~> 1.2'
 
-  s.add_development_dependency 'rake', '~> 11.3.0'
-  s.add_development_dependency 'rspec', '~> 3.5.0'
+  s.add_development_dependency 'rake', '~> 12'
+  s.add_development_dependency 'rspec', '~> 3.5'
 end
