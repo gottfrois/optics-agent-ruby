@@ -7,6 +7,7 @@ require 'optics-agent/reporting/detect_server_side_error'
 require 'net/http'
 require 'faraday'
 require 'logger'
+require 'time'
 
 module OpticsAgent
   class Agent
@@ -111,9 +112,22 @@ Use the `schema` configuration setting, or call `agent.instrument_schema`
       debug "spawning reporting thread"
       Thread.new do
         debug "reporting thread spawned"
+
+        report_interval = report_interval_ms * 1000
+        last_started = Time.now
+
         while true
-          sleep @configuration.report_interval_ms / 1000.0
+          next_send = last_started + report_interval
+          sleep_time = next_send - Time.now
+
+          if sleep_time < 0
+            warn 'Report took more than one interval! Some requests might appear at the wrong time.'
+          else
+            sleep sleep_time
+          end
+
           debug "running reporting job"
+          last_started = Time.now
           ReportJob.new.perform(self)
           debug "finished running reporting job"
         end
