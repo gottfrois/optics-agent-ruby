@@ -3,6 +3,7 @@ require 'optics-agent/instrumenters/field'
 require 'optics-agent/reporting/report_job'
 require 'optics-agent/reporting/schema_job'
 require 'optics-agent/reporting/query-trace'
+require 'optics-agent/reporting/detect_server_side_error'
 require 'net/http'
 require 'faraday'
 require 'logger'
@@ -91,9 +92,18 @@ Use the `schema` configuration setting, or call `agent.instrument_schema`
 
     def reporting_connection
       @reporting_connection ||=
-        Faraday.new(:url => @configuration.endpoint_url) do |faraday|
+        Faraday.new(:url => @configuration.endpoint_url) do |conn|
+          conn.request :retry,
+                       :max => 5,
+                       :interval => 0.1,
+                       :max_interval => 10,
+                       :backoff_factor => 2,
+                       :exceptions => [Exception],
+                       :retry_if => ->(env, exc) { true }
+          conn.use OpticsAgent::Reporting::DetectServerSideError
+
           # XXX: allow setting adaptor in config
-          faraday.adapter :net_http_persistent
+          conn.adapter :net_http_persistent
         end
     end
 
@@ -142,8 +152,8 @@ Use the `schema` configuration setting, or call `agent.instrument_schema`
         request.url path
         request.headers['x-api-key'] = @configuration.api_key
         request.headers['user-agent'] = "optics-agent-rb"
-
         request.body = message.class.encode(message)
+
         if @configuration.debug || @configuration.print_reports
           log "sending message: #{message.class.encode_json(message)}"
         end
