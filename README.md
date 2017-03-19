@@ -41,8 +41,8 @@ def create
     variables: query_variables,
     context: {
       # This is the key line: we take the optics_agent passed in from the
-      # Rack environment, give it the query_string, and pass it as context
-      optics_agent: env[:optics_agent].with_document(query_string)
+      # Rack environment and pass it as context
+      optics_agent: env[:optics_agent]
     }
   )
 
@@ -60,6 +60,24 @@ You must:
 2. Register your schema with the `agent.configure` block
 3. Attach the `agent.rack_middleware` to your Rack router
 4. Ensure you pass the `optics_agent` context from the rack environment to your schema execution.
+
+### Non-HTTP queries
+
+If you aren't actually servicing a HTTP/Rack request in executing the query, simply pass:
+
+```ruby
+  context: { optics_agent: :no_rack }
+```
+
+This will mean the query is instrumented without HTTP timings or client versions.
+
+### Skipping queries
+
+If you want to skip a particular query, pass:
+
+```ruby
+  context: { optics_agent: :skip }
+```
 
 ### Configuration
 

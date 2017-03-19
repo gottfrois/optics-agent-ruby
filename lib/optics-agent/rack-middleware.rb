@@ -1,5 +1,5 @@
-require 'optics-agent/agent'
-require 'optics-agent/reporting/query'
+require 'optics-agent/query_context'
+
 module OpticsAgent
   class RackMiddleware
     # Right now we assume there'll only be a single rack middleware in an
@@ -20,34 +20,15 @@ module OpticsAgent
       agent.ensure_reporting!
       agent.debug { "rack-middleware: request started" }
 
-      query = OpticsAgent::Reporting::Query.new
-
-      # Attach so resolver middleware can access
-      env[:optics_agent] = RackAgent.new(agent, query)
+      # Attach so field instrumenters can access
+      env[:optics_agent] = QueryContext.new(agent, env)
 
       result = @app.call(env)
 
       agent.debug { "rack-middleware: request finished" }
-      if (query.document)
-        agent.debug { "rack-middleware: Adding a query with #{query.reports.length} field reports" }
-        query.finish!
-        agent.add_query(query, env)
-      end
+      query = env[:optics_agent].request_finished!
 
       result
-    end
-  end
-
-  class RackAgent
-    attr_reader :agent, :query
-    def initialize(agent, query)
-      @agent = agent
-      @query = query
-    end
-
-    def with_document(query_string)
-      @query.document = query_string
-      self
     end
   end
 end
