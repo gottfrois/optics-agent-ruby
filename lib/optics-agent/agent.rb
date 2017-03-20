@@ -150,8 +150,7 @@ Use the `schema` configuration setting, or call `agent.instrument_schema`
       end
 
       if @configuration.debug || @configuration.print_reports
-        log "got response: #{response}"
-        log "response body: #{response.body}"
+        log "got response body: #{response.body}"
       end
     end
 
