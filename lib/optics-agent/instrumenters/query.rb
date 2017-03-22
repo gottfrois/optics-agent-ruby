@@ -10,7 +10,7 @@ module OpticsAgent
         query_context = query.context[:optics_agent]
         return if query_context == :skip
 
-        @agent.ensure_reporting!
+        @agent.ensure_reporting_stats!
 
         # the rack request didn't add the agent, maybe there is none?
         unless query_context

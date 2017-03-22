@@ -22,6 +22,7 @@ module OpticsAgent
     attr_reader :schema, :report_traces
 
     def initialize
+      @stats_reporting_thread = nil
       @query_queue = []
       @semaphone = Mutex.new
 
@@ -77,7 +78,7 @@ Perhaps you are calling both `agent.configure { schema YourSchema }` and
 
     # We call this method on every request to ensure that the reporting thread
     # is active in the correct process for pre-forking webservers like unicorn
-    def ensure_reporting!
+    def ensure_reporting_stats!
       unless @schema
         warn """No schema instrumented.
 Use the `schema` configuration setting, or call `agent.instrument_schema`
@@ -85,10 +86,14 @@ Use the `schema` configuration setting, or call `agent.instrument_schema`
         return
       end
 
-      unless @reporting_thread_active || disabled?
+      unless reporting_stats? || disabled?
         schedule_report
-        @reporting_thread_active = true
       end
+    end
+
+    # @deprecated Use ensure_reporting_stats! instead
+    def ensure_reporting!
+      ensure_reporting_stats!
     end
 
     def reporting_connection
@@ -108,29 +113,53 @@ Use the `schema` configuration setting, or call `agent.instrument_schema`
         end
     end
 
+    def reporting_stats?
+      @stats_reporting_thread != nil && !!@stats_reporting_thread.status
+    end
+
     def schedule_report
-      debug "spawning reporting thread"
-      Thread.new do
-        debug "reporting thread spawned"
+      @semaphone.synchronize do
+        return if reporting_stats?
 
-        report_interval = report_interval_ms * 1000
-        last_started = Time.now
+        debug "spawning reporting thread"
 
-        while true
-          next_send = last_started + report_interval
-          sleep_time = next_send - Time.now
+        thread = Thread.new do
+          begin
+            debug "reporting thread spawned"
 
-          if sleep_time < 0
-            warn 'Report took more than one interval! Some requests might appear at the wrong time.'
-          else
-            sleep sleep_time
+            report_interval = @configuration.report_interval_ms * 1000
+            last_started = Time.now
+
+            while true
+              next_send = last_started + report_interval
+              sleep_time = next_send - Time.now
+
+              if sleep_time < 0
+                warn 'Report took more than one interval! Some requests might appear at the wrong time.'
+              else
+                sleep sleep_time
+              end
+
+              debug "running reporting job"
+              last_started = Time.now
+              ReportJob.new.perform(self)
+              debug "finished running reporting job"
+            end
+          rescue Exception => e
+            warn "Stats report thread dying: #{e}"
           end
-
-          debug "running reporting job"
-          last_started = Time.now
-          ReportJob.new.perform(self)
-          debug "finished running reporting job"
         end
+
+        at_exit do
+          if thread.status
+            debug 'sending last stats report before exiting'
+            thread.exit
+            ReportJob.new.perform(self)
+            debug 'last stats report sent'
+          end
+        end
+
+        @stats_reporting_thread = thread
       end
     end
 
