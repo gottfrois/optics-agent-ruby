@@ -17,7 +17,7 @@ module OpticsAgent
 
     def call(env)
       agent = self.class.agent
-      agent.ensure_reporting!
+      agent.ensure_reporting_stats!
       agent.debug { "rack-middleware: request started" }
 
       # Attach so field instrumenters can access

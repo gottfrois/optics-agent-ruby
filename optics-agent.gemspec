@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'optics-agent'
-  s.version     = '0.5.0'
+  s.version     = '0.5.1'
   s.date        = '2016-10-06'
   s.summary     = "An Agent for Apollo Optics"
   s.description = "An Agent for Apollo Optics, http://optics.apollodata.com"
