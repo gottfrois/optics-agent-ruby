@@ -127,7 +127,7 @@ Use the `schema` configuration setting, or call `agent.instrument_schema`
           begin
             debug "reporting thread spawned"
 
-            report_interval = @configuration.report_interval_ms * 1000
+            report_interval = @configuration.report_interval_ms / 1000.0
             last_started = Time.now
 
             while true

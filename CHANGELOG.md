@@ -1,6 +1,6 @@
 ### vNEXT
 
-### v0.5.1
+### v0.5.3
 
 - Support for non-HTTP queries
 - More resilient communication with the Optics service
