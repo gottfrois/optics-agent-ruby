@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.date        = '2016-10-06'
   s.summary     = "An Agent for Apollo Optics"
   s.description = "An Agent for Apollo Optics, http://optics.apollodata.com"
-  s.authors     = ["Tom Coleman "]
-  s.email       = 'tom@meteor.com'
+  s.authors     = ["Meteor Development Group"]
+  s.email       = 'vendor+optics@meteor.com'
   s.files       = Dir["{lib}/**/*", "LICENSE", "README.md"]
   s.test_files  = Dir["{spec}/**/*"]
 
