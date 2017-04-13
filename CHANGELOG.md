@@ -1,5 +1,9 @@
 ### vNEXT
 
+### v0.5.4
+
+- Bugfixes.
+
 ### v0.5.3
 
 - Support for non-HTTP queries
