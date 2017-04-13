@@ -31,7 +31,7 @@ module OpticsAgent::Reporting
         type = schema.types[type_name]
         next unless type.is_a? GraphQL::ObjectType
 
-        fields = type.fields.values.map do |field|
+        fields = type.all_fields.map do |field|
           Field.new({
             name: field.name,
             # XXX: does this actually work for all types?
