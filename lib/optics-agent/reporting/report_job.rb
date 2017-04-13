@@ -12,7 +12,8 @@ module OpticsAgent::Reporting
         report.decorate_from_schema(agent.schema)
         report.send_with(agent)
       rescue Exception => e
-        agent.debug "report failed #{e}"
+        agent.debug "stats report failed #{e}"
+        agent.debug e.backtrace
       end
     end
   end

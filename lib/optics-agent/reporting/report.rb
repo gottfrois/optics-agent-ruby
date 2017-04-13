@@ -95,7 +95,7 @@ module OpticsAgent::Reporting
           type = schema.types[type_stat.name]
           throw "Type #{type_stat.name} not found!" unless type
 
-          field = type.fields[field_stat.name]
+          field = type.get_field(field_stat.name)
           throw "Field #{type_stat.name}.#{field_stat.name} not found!" unless field
 
           field_stat.returnType = field.type.to_s
