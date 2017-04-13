@@ -27,7 +27,7 @@ If you don't want to instrument this query, pass `context: {optics_agent: :skip}
           query_context = query.context[:optics_agent]
         end
 
-        query_context.with_document(query.query_string)
+        query_context.with_document(query.document.to_query_string)
       end
 
       def after_query(query)
